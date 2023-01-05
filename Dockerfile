@@ -8,6 +8,7 @@ WORKDIR /
 RUN mkdir build_space
 WORKDIR /build_space
 COPY . .
+COPY .env.template .env
 RUN make build
 
 # production-stage
