@@ -15,7 +15,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-var logger = log.New()
+var logger = log.Get()
 
 func RunApp(cfg *config.Config) {
 	gin.SetMode(cfg.Server.RouterDebugMode)

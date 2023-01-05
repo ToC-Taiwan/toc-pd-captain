@@ -16,7 +16,7 @@ import (
 	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
-var logger = log.New()
+var logger = log.Get()
 
 const (
 	urlPrefix = "/tpc"

@@ -9,6 +9,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/ilyakaznacheev/cleanenv"
 	"github.com/rifflock/lfshook"
 	"github.com/sirupsen/logrus"
 )
@@ -32,12 +33,9 @@ type Log struct {
 
 var singleton *Log
 
-// New -.
-func New(opts ...Option) *Log {
+// Get -.
+func Get() *Log {
 	if singleton != nil {
-		if len(opts) > 0 {
-			singleton.Warn("logger already initialized, options will be ignored")
-		}
 		return singleton
 	}
 
@@ -52,10 +50,7 @@ func New(opts ...Option) *Log {
 		},
 		basePath: getExecPath(),
 	}
-
-	for _, opt := range opts {
-		opt(l.config)
-	}
+	l.readEnv()
 
 	jsonFormatter := &logrus.JSONFormatter{
 		DisableHTMLEscape: true,
@@ -91,6 +86,17 @@ func New(opts ...Option) *Log {
 
 	singleton = l
 	return singleton
+}
+
+func (l *Log) readEnv() {
+	cfg := env{}
+	if err := cleanenv.ReadEnv(&cfg); err != nil {
+		panic(err)
+	}
+
+	LogLevel(Level(cfg.Level))(l.config)
+	LogFormat(Format(cfg.Format))(l.config)
+	NeedCaller(cfg.NeedCaller)(l.config)
 }
 
 func (l *Log) fileHook(formatter logrus.Formatter) *lfshook.LfsHook {
