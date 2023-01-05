@@ -9,5 +9,5 @@ func main() {
 	cfg := config.GetConfig()
 
 	app.InitDB(cfg.Database)
-	app.RunApp()
+	app.RunApp(cfg)
 }

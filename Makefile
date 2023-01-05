@@ -1,8 +1,10 @@
 include .env
 export
 
-run: ### run
-	@go build -o toc-pd-captain ./cmd/app && ./toc-pd-captain
+run: swag-v1 ### run
+	@go mod tidy && go mod download && go generate ./... && \
+	cp ./configs/default.config.yml ./configs/config.yml && clear && \
+	go build -o toc-pd-captain ./cmd/app && ./toc-pd-captain
 .PHONY: run
 
 help: ## display this help screen

@@ -7,5 +7,7 @@ type Database struct {
 }
 
 type Server struct {
-	HTTP string `env:"HTTP" env-required:"true"`
+	HTTP                      string `env:"HTTP" env-required:"true"`
+	RouterDebugMode           string `env:"GIN_MODE" env-required:"true"`
+	DisableSwaggerHTTPHandler string `env:"DISABLE_SWAGGER_HTTP_HANDLER" env-required:"true"`
 }

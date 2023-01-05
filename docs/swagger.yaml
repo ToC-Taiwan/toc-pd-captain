@@ -1,0 +1,26 @@
+info:
+  contact: {}
+  description: API docs for Auto Trade
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  title: TOC PD CAPTAIN
+  version: 1.0.0
+paths:
+  /-/health:
+    get:
+      consumes:
+      - application/json
+      description: healthCheck
+      operationId: healthCheck
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      summary: healthCheck
+      tags:
+      - healthCheck
+swagger: "2.0"

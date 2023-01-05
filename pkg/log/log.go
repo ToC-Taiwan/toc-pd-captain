@@ -17,7 +17,7 @@ const (
 	_defaultLogFormat  = FormatText
 	_defaultLogLevel   = LevelInfo
 	_defaultNeedCaller = false
-	_defaultTimeFormat = "2006-01-02 15:04:05"
+	_defaultTimeFormat = time.RFC3339
 	_defaultFilePath   = "./logs"
 	_defaultFileName   = "log"
 )
