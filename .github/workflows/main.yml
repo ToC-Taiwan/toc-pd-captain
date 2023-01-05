@@ -1,0 +1,128 @@
+name: Workflow
+run-name: ${{ github.actor }} is running actions 🍀
+
+on:
+    workflow_dispatch:
+    push:
+        branches:
+            - main
+env:
+    REGISTRY: ghcr.io
+
+jobs:
+    Lint:
+        runs-on: ubuntu-latest
+        steps:
+            - name: setup golang
+              uses: actions/setup-go@v3
+              with:
+                  go-version: 1.19.4
+
+            - name: checkout
+              uses: actions/checkout@v3
+
+            - name: golangci-lint
+              uses: golangci/golangci-lint-action@v3
+              with:
+                  version: v1.50.1
+
+    Test:
+        needs: Lint
+        runs-on: ubuntu-latest
+        steps:
+            - name: setup golang
+              uses: actions/setup-go@v3
+              with:
+                  go-version: 1.19.4
+
+            - name: checkout
+              uses: actions/checkout@v3
+
+            - name: build test
+              run: go build -v ./...
+
+            - name: go test
+              run: |
+                  cp ./configs/default.config.yml ./configs/config.yml
+                  go test -v -cover -race ./internal/...
+
+    Build:
+        needs: Test
+        env:
+            REPOSITORY: "${{ github.repository }}"
+            SHA: ${{ github.sha }}
+
+        runs-on: ubuntu-latest
+        steps:
+            - name: set local env
+              run: |
+                  echo "REPOSITORY_LC=${REPOSITORY,,}" >> ${GITHUB_ENV}
+                  echo "SHORT_SHA=$(echo ${SHA} | cut -c1-7)" >> ${GITHUB_ENV}
+
+            - name: checkout
+              uses: actions/checkout@v3
+
+            - name: log in to the Container registry
+              uses: docker/login-action@v2
+              with:
+                  registry: ${{ env.REGISTRY }}
+                  username: ${{ github.actor }}
+                  password: ${{ secrets.GITHUB_TOKEN }}
+
+            - name: build and push
+              uses: docker/build-push-action@v3
+              with:
+                  push: true
+                  tags: |
+                      ${{ env.REGISTRY }}/${{ env.REPOSITORY_LC }}:${{ env.SHORT_SHA }}
+                      ${{ env.REGISTRY }}/${{ env.REPOSITORY_LC }}:latest
+
+    # Deployment:
+    #     needs: Build
+    #     runs-on: ubuntu-latest
+    #     env:
+    #         REPOSITORY: "${{ github.repository }}"
+    #         SHA: ${{ github.sha }}
+
+    #     steps:
+    #         - name: set local env
+    #           run: |
+    #               echo "REPOSITORY_LC=${REPOSITORY,,}" >> ${GITHUB_ENV}
+    #               echo "SHORT_SHA=$(echo ${SHA} | cut -c1-7)" >> ${GITHUB_ENV}
+
+    #         - name: checkout
+    #           uses: actions/checkout@v3
+
+    #         - name: deploy
+    #           uses: appleboy/ssh-action@master
+    #           with:
+    #               host: ${{ secrets.TRADER_HOST }}
+    #               port: ${{ secrets.TRADER_PORT }}
+    #               username: ${{ secrets.TRADER_USERNAME }}
+    #               key: ${{ secrets.TRADER_KEY }}
+    #               script: |
+    #                   docker kill toc-pd-captain || true
+    #                   docker system prune --volumes -f
+    #                   docker rmi $(docker images '${{ env.REGISTRY }}/${{ env.REPOSITORY_LC }}' -a -q) || true
+    #                   sleep 10
+
+    #                   rm -rf ~/toc-pd-captain-env && mkdir -p ~/toc-pd-captain-env && touch ~/toc-pd-captain-env/.env
+    #                   rm -rf ~/toc-pd-captain-configs && mkdir -p ~/toc-pd-captain-configs && touch ~/toc-pd-captain-configs/config.yml
+    #                   rm -rf ~/toc-pd-captain-logs
+
+    #                   echo "${{ secrets.MACHINE_TRADING_ENV }}" > ~/toc-pd-captain-env/.env
+    #                   echo "${{ secrets.MACHINE_TRADING_CONFIG }}" > ~/toc-pd-captain-configs/config.yml
+
+    #                   docker login ${{ env.REGISTRY }} -u ${{ github.actor }} -p ${{ secrets.GITHUB_TOKEN }}
+    #                   docker pull ${{ env.REGISTRY }}/${{ env.REPOSITORY_LC }}:${{ env.SHORT_SHA }}
+
+    #                   docker run \
+    #                     --name toc-pd-captain \
+    #                     --network tocvlan \
+    #                     --ip=172.20.10.228 \
+    #                     --restart always \
+    #                     -e TZ="Asia/Taipei" \
+    #                     -v ~/toc-pd-captain-logs:/toc-pd-captain/logs \
+    #                     -v ~/toc-pd-captain-env/.env:/toc-pd-captain/.env \
+    #                     -v ~/toc-pd-captain-configs/config.yml:/toc-pd-captain/configs/config.yml \
+    #                     -dt ${{ env.REGISTRY }}/${{ env.REPOSITORY_LC }}:${{ env.SHORT_SHA }}

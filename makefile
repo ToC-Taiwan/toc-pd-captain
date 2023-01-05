@@ -3,7 +3,7 @@ export
 
 run: swag-v1 ### run
 	@go generate ./... && cp ./configs/default.config.yml ./configs/config.yml && clear && \
-	go build -o toc-pd-captain ./cmd/app && ./toc-pd-captain
+	make build && ./toc-pd-captain
 .PHONY: run
 
 help: ## display this help screen
@@ -36,3 +36,7 @@ migrate-down-last: ### migration down one step
 migrate-create:  ### create new migration
 	@migrate create -ext sql -dir migrations -tz "Asia/Taipei" -format "2006010215" 'migration'
 .PHONY: migrate-create
+
+build: ### build
+	@cd build; sh build.sh
+.PHONY: build
