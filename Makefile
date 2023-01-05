@@ -2,8 +2,7 @@ include .env
 export
 
 run: swag-v1 ### run
-	@go mod tidy && go mod download && go generate ./... && \
-	cp ./configs/default.config.yml ./configs/config.yml && clear && \
+	@go generate ./... && cp ./configs/default.config.yml ./configs/config.yml && clear && \
 	go build -o toc-pd-captain ./cmd/app && ./toc-pd-captain
 .PHONY: run
 
@@ -13,7 +12,7 @@ help: ## display this help screen
 
 swag-v1: ### swag init
 	@echo 'package main' > ./swagger.go && \
-	swag init -g internal/controller/http/v1/router.go && \
+	swag init -g internal/controller/http/router/router.go && \
 	rm -rf ./swagger.go && \
 	echo "" >> ./docs/swagger.json && git add ./docs
 .PHONY: swag-v1

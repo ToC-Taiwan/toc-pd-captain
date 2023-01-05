@@ -7,7 +7,8 @@ import (
 	"syscall"
 
 	"tpc/cmd/config"
-	v1 "tpc/internal/controller/http/v1"
+	"tpc/internal/controller/http/router"
+	"tpc/internal/usecase/user"
 	"tpc/pkg/httpserver"
 	"tpc/pkg/log"
 
@@ -19,17 +20,12 @@ var logger = log.New()
 func RunApp(cfg *config.Config) {
 	gin.SetMode(cfg.Server.RouterDebugMode)
 
+	// create all needed usecases
+	userUseCase := user.NewUserUseCase()
+
 	handler := gin.New()
-	v1.NewRouter(handler)
-	httpServer := httpserver.New(
-		handler,
-		httpserver.Port(cfg.Server.HTTP),
-	)
-
-	Serve(httpServer)
-}
-
-func Serve(httpServer *httpserver.Server) {
+	router.NewRouter(handler, userUseCase)
+	httpServer := httpserver.New(handler, httpserver.Port(cfg.Server.HTTP))
 	interrupt := make(chan os.Signal, 1)
 	signal.Notify(interrupt, os.Interrupt, syscall.SIGTERM)
 

@@ -1,11 +1,26 @@
+definitions:
+  entity.User:
+    properties:
+      password:
+        type: string
+      username:
+        type: string
+    type: object
+  router.loginResponseBody:
+    properties:
+      expire:
+        type: string
+      token:
+        type: string
+    type: object
 info:
   contact: {}
-  description: API docs for Auto Trade
+  description: API doc for PD Capatain
   license:
     name: Apache 2.0
     url: http://www.apache.org/licenses/LICENSE-2.0.html
-  title: TOC PD CAPTAIN
-  version: 1.0.0
+  title: ToC PD Capatain
+  version: 1.0.0-alpha
 paths:
   /-/health:
     get:
@@ -22,5 +37,28 @@ paths:
             type: string
       summary: healthCheck
       tags:
-      - healthCheck
+      - Health
+  /login:
+    post:
+      consumes:
+      - application/json
+      description: Every api request will extend token expired time, websocket will
+        not extend.
+      parameters:
+      - description: Body
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/entity.User'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/router.loginResponseBody'
+      summary: Login
+      tags:
+      - Login V1
 swagger: "2.0"

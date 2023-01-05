@@ -30,7 +30,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "healthCheck"
+                    "Health"
                 ],
                 "summary": "healthCheck",
                 "operationId": "healthCheck",
@@ -43,18 +43,76 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/login": {
+            "post": {
+                "description": "Every api request will extend token expired time, websocket will not extend.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Login V1"
+                ],
+                "summary": "Login",
+                "parameters": [
+                    {
+                        "description": "Body",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/entity.User"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/router.loginResponseBody"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "entity.User": {
+            "type": "object",
+            "properties": {
+                "password": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
+        },
+        "router.loginResponseBody": {
+            "type": "object",
+            "properties": {
+                "expire": {
+                    "type": "string"
+                },
+                "token": {
+                    "type": "string"
+                }
+            }
         }
     }
 }`
 
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
-	Version:          "1.0.0",
+	Version:          "1.0.0-alpha",
 	Host:             "",
 	BasePath:         "",
 	Schemes:          []string{},
-	Title:            "TOC PD CAPTAIN",
-	Description:      "API docs for Auto Trade",
+	Title:            "ToC PD Capatain",
+	Description:      "API doc for PD Capatain",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
 }

@@ -1,14 +1,14 @@
 {
     "swagger": "2.0",
     "info": {
-        "description": "API docs for Auto Trade",
-        "title": "TOC PD CAPTAIN",
+        "description": "API doc for PD Capatain",
+        "title": "ToC PD Capatain",
         "contact": {},
         "license": {
             "name": "Apache 2.0",
             "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
         },
-        "version": "1.0.0"
+        "version": "1.0.0-alpha"
     },
     "paths": {
         "/-/health": {
@@ -21,7 +21,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "healthCheck"
+                    "Health"
                 ],
                 "summary": "healthCheck",
                 "operationId": "healthCheck",
@@ -32,6 +32,64 @@
                             "type": "string"
                         }
                     }
+                }
+            }
+        },
+        "/login": {
+            "post": {
+                "description": "Every api request will extend token expired time, websocket will not extend.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Login V1"
+                ],
+                "summary": "Login",
+                "parameters": [
+                    {
+                        "description": "Body",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/entity.User"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/router.loginResponseBody"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "entity.User": {
+            "type": "object",
+            "properties": {
+                "password": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
+        },
+        "router.loginResponseBody": {
+            "type": "object",
+            "properties": {
+                "expire": {
+                    "type": "string"
+                },
+                "token": {
+                    "type": "string"
                 }
             }
         }

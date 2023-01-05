@@ -3,6 +3,8 @@ package utils
 
 import (
 	"crypto/rand"
+	"crypto/sha256"
+	"encoding/hex"
 	"math/big"
 )
 
@@ -34,4 +36,11 @@ func RandomASCIILowerOctdigitsString(n int) string {
 		s[i] = letters[randomBigInt.Int64()]
 	}
 	return string(s)
+}
+
+// SHA256Generator -.
+func SHA256Generator(s string) string {
+	hash := sha256.New()
+	hash.Write([]byte(s))
+	return hex.EncodeToString(hash.Sum(nil))
 }
