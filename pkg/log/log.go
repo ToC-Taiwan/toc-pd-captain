@@ -94,8 +94,8 @@ func (l *Log) readEnv() {
 		panic(err)
 	}
 
-	LogLevel(Level(cfg.Level))(l.config)
-	LogFormat(Format(cfg.Format))(l.config)
+	LogLevel(cfg.Level)(l.config)
+	LogFormat(cfg.Format)(l.config)
 	NeedCaller(cfg.NeedCaller)(l.config)
 }
 

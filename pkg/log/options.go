@@ -12,17 +12,14 @@ type config struct {
 // Option -.
 type Option func(*config)
 
-func LogLevel(level Level) Option {
+func LogLevel(level string) Option {
 	return func(c *config) {
-		if level == "" {
-			return
+		switch level {
+		case LevelPanic.String(), LevelFatal.String(), LevelError.String(), LevelWarn.String(), LevelInfo.String(), LevelDebug.String(), LevelTrace.String():
+			c.level = Level(level)
+		default:
+			c.level = _defaultLogLevel
 		}
-
-		if level != "panic" && level != "fatal" && level != "error" && level != "warn" && level != "info" && level != "debug" && level != "trace" {
-			return
-		}
-
-		c.level = level
 	}
 }
 
@@ -32,17 +29,12 @@ func TimeFormat(format string) Option {
 	}
 }
 
-func LogFormat(format Format) Option {
+func LogFormat(format string) Option {
 	return func(c *config) {
-		if format == "" {
-			return
-		}
-
 		if format != "json" && format != "text" {
-			return
+			c.format = _defaultLogFormat
 		}
-
-		c.format = format
+		c.format = Format(format)
 	}
 }
 

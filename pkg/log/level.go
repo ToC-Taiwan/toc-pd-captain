@@ -14,6 +14,10 @@ const (
 	LevelTrace Level = "trace"
 )
 
+func (l Level) String() string {
+	return string(l)
+}
+
 func (l Level) Level() logrus.Level {
 	switch l {
 	case LevelPanic:
